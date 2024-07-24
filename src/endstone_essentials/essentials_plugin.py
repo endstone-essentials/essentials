@@ -1,5 +1,3 @@
-import datetime
-
 from endstone.command import Command, CommandSender
 from endstone.event import EventPriority, ServerLoadEvent, event_handler
 from endstone.plugin import Plugin
@@ -14,13 +12,13 @@ class EssentialsPlugin(Plugin):
     permissions = {}
 
     def on_load(self) -> None:
-        self.logger.info("essentials plugin is loaded!")
+        self.logger.info("Essentials plugin is loaded!")
 
     def on_enable(self) -> None:
-        self.logger.info("essentials plugin is enabled!")
+        self.logger.info("Essentials plugin is enabled!")
 
     def on_disable(self) -> None:
-        self.logger.info("essentials plugin is disabled!")
+        self.logger.info("Essentials plugin is disabled!")
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         return True

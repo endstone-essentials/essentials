@@ -1,3 +1,3 @@
-from essentials_plugin import EssentialsPlugin
+from endstone_essentials.essentials_plugin import EssentialsPlugin
 
 __all__ = ["EssentialsPlugin"]
