@@ -2,8 +2,9 @@ import uuid
 
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
-from endstone.event import EventPriority, ServerLoadEvent, event_handler
+from endstone.event import EventPriority, PlayerDeathEvent, event_handler
 from endstone.plugin import Plugin
+from endstone.level import Location
 
 
 class EssentialsPlugin(Plugin):
@@ -39,6 +40,11 @@ class EssentialsPlugin(Plugin):
             "aliases": ["tpd"],
             "permissions": ["essentials.command.tpdeny"],
         },
+        "back": {
+            "description": "Back to the place where you last died.",
+            "usages": ["/back"],
+            "permissions": ["essentials.command.back"],
+        },
     }
 
     permissions = {
@@ -51,6 +57,7 @@ class EssentialsPlugin(Plugin):
                 "essentials.command.tpa": True,
                 "essentials.command.tpaccept": True,
                 "essentials.command.tpdeny": True,
+                "essentials.command.back": True
             }
         },
         "essentials.command.fly": {
@@ -73,11 +80,17 @@ class EssentialsPlugin(Plugin):
             "description": "Allow users to use the /tpdeny command.",
             "default": True,
         },
+        "essentials.command.back": {
+            "description": "Allow users to use the /back command.",
+            "default": True,
+        }
     }
+
+    teleport_requests: dict[uuid.UUID, uuid.UUID] = {}
+    last_death_locations: dict[uuid.UUID, Location] = {}
 
     def __init__(self):
         super().__init__()
-        self.teleport_requests: dict[uuid.UUID, uuid.UUID] = dict()
 
     def on_load(self) -> None:
         self.logger.info("Essentials plugin is loaded!")
@@ -87,6 +100,11 @@ class EssentialsPlugin(Plugin):
 
     def on_disable(self) -> None:
         self.logger.info("Essentials plugin is disabled!")
+
+    @event_handler()
+    def on_player_death(self, event: PlayerDeathEvent):
+        self.last_death_locations[event.player.unique_id] = event.player.location
+        return
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not isinstance(sender, Player):
@@ -105,12 +123,14 @@ class EssentialsPlugin(Plugin):
                 else:
                     sender.allow_flight = True
                     sender.send_message("You can now fly")
+
             case "bd", "broadcast":
                 if len(args) == 0:
                     sender.send_error_message("You have to send something")
                     return False
 
                 self.server.broadcast_message(" ".join(args))
+
             case "tpa":
                 if len(args) != 1:
                     sender.send_error_message("Usage: /tpa <player>")
@@ -123,10 +143,26 @@ class EssentialsPlugin(Plugin):
                     return True
 
                 self.handle_teleport_request(sender, target)
+
             case "tpaccept":
                 self.accept_teleport_request(sender)
+
             case "tpdeny":
                 self.deny_teleport_request(sender)
+
+            case "back":
+                if len(args) != 0:
+                    sender.send_error_message("Usage: /back")
+                    return False
+
+                if sender.unique_id not in self.last_death_locations:
+                    sender.send_error_message("You haven't died yet")
+                    return False
+
+                location = self.last_death_locations[sender.unique_id]
+                self.server.dispatch_command(self.server.command_sender, f'execute as "{sender.name}" in "{location.dimension.type.name}" run tp @s "{location.x}" "{location.y}" "{location.z}"')
+                sender.send_message("You have been teleported to the last place of death")
+
         return True
 
     def handle_teleport_request(self, player: Player, target: Player) -> None:
