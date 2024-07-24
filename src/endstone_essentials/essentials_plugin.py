@@ -13,6 +13,12 @@ class EssentialsPlugin(Plugin):
             "description": "Switch flying mode",
             "usages": ["/fly"],
             "permissions": ["essentials.command.fly"]
+        },
+        "broadcast": {
+            "description": "Broadcast a message",
+            "usages": ["/broadcast <message: message>"],
+            "aliases": ["bd"],
+            "permissions": ["essentials.command.broadcast"]
         }
     }
 
@@ -21,11 +27,16 @@ class EssentialsPlugin(Plugin):
             "description": "Allow users to use all commands provided by this plugin.",
             "default": True,
             "children": {
-                "essentials.command.fly": True
+                "essentials.command.fly": True,
+                "essentials.command.broadcast": True
             }
         },
         "essentials.command.fly": {
             "description": "Allow users to use the /fly command.",
+            "default": True,
+        },
+        "essentials.command.broadcast": {
+            "description": "Allow users to use the /broadcast command.",
             "default": True,
         },
     }
@@ -56,5 +67,10 @@ class EssentialsPlugin(Plugin):
                 else:
                     sender.allow_flight = True
                     sender.send_message("You can now fly")
+            case "bd", "broadcast":
+                if len(args) == 0:
+                    sender.send_error_message("You have to send something")
+                    return False
 
+                self.server.broadcast_message(" ".join(args))
         return True
