@@ -1,4 +1,6 @@
-from endstone import Player
+import uuid
+
+from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
 from endstone.event import EventPriority, ServerLoadEvent, event_handler
 from endstone.plugin import Plugin
@@ -19,7 +21,24 @@ class EssentialsPlugin(Plugin):
             "usages": ["/broadcast <message: message>"],
             "aliases": ["bd"],
             "permissions": ["essentials.command.broadcast"]
-        }
+        },
+        "tpa": {
+            "description": "Send a teleport request to another player.",
+            "usages": ["/tpa <target: player>"],
+            "permissions": ["essentials.command.tpa"],
+        },
+        "tpaccept": {
+            "description": "Accept a teleport request.",
+            "usages": ["/tpaccept"],
+            "aliases": ["tpac"],
+            "permissions": ["essentials.command.tpaccept"],
+        },
+        "tpdeny": {
+            "description": "Deny a teleport request.",
+            "usages": ["/tpdeny"],
+            "aliases": ["tpd"],
+            "permissions": ["essentials.command.tpdeny"],
+        },
     }
 
     permissions = {
@@ -28,7 +47,10 @@ class EssentialsPlugin(Plugin):
             "default": True,
             "children": {
                 "essentials.command.fly": True,
-                "essentials.command.broadcast": True
+                "essentials.command.broadcast": True,
+                "essentials.command.tpa": True,
+                "essentials.command.tpaccept": True,
+                "essentials.command.tpdeny": True,
             }
         },
         "essentials.command.fly": {
@@ -39,7 +61,23 @@ class EssentialsPlugin(Plugin):
             "description": "Allow users to use the /broadcast command.",
             "default": True,
         },
+        "essentials.command.tpa": {
+            "description": "Allow users to use the /tpa command.",
+            "default": True,
+        },
+        "essentials.command.tpaccept": {
+            "description": "Allow users to use the /tpaccept command.",
+            "default": True,
+        },
+        "essentials.command.tpdeny": {
+            "description": "Allow users to use the /tpdeny command.",
+            "default": True,
+        },
     }
+
+    def __init__(self):
+        super().__init__()
+        self.teleport_requests: dict[uuid.UUID, uuid.UUID] = dict()
 
     def on_load(self) -> None:
         self.logger.info("Essentials plugin is loaded!")
@@ -73,4 +111,58 @@ class EssentialsPlugin(Plugin):
                     return False
 
                 self.server.broadcast_message(" ".join(args))
+            case "tpa":
+                if len(args) != 1:
+                    sender.send_error_message("Usage: /tpa <player>")
+                    return True
+
+                player_name = args[0].strip('\"')
+                target = self.server.get_player(player_name)
+                if target is None:
+                    sender.send_message(f"Player {player_name} not found.")
+                    return True
+
+                self.handle_teleport_request(sender, target)
+            case "tpaccept":
+                self.accept_teleport_request(sender)
+            case "tpdeny":
+                self.deny_teleport_request(sender)
         return True
+
+    def handle_teleport_request(self, player: Player, target: Player) -> None:
+        if target.unique_id in self.teleport_requests:
+            player.send_message(ColorFormat.YELLOW + "This player already has a pending teleport request.")
+            return
+
+        self.teleport_requests[target.unique_id] = player.unique_id
+        player.send_message(ColorFormat.GREEN + f"Teleport request sent to {target.name}.")
+        target.send_message(ColorFormat.GREEN + f"{player.name} has sent you a teleport request. "
+                                                f"Use /tpaccept or /tpdeny.")
+
+    def accept_teleport_request(self, player: Player) -> None:
+        if player.unique_id not in self.teleport_requests:
+            player.send_message(ColorFormat.YELLOW + "You have no pending teleport requests.")
+            return
+
+        source = self.server.get_player(self.teleport_requests[player.unique_id])
+        if source is None:
+            player.send_message(ColorFormat.YELLOW + "The player who sent the teleport request is no longer online.")
+        else:
+            # TODO(api): replace with player.teleport
+            self.server.dispatch_command(self.server.command_sender, f'tp "{source.name}" "{player.name}"')
+            source.send_message(ColorFormat.GREEN + f"You have been teleported to {player.name}.")
+            player.send_message(ColorFormat.GREEN + "Teleport request accepted.")
+
+        del self.teleport_requests[player.unique_id]
+
+    def deny_teleport_request(self, player: Player) -> None:
+        if player.unique_id not in self.teleport_requests:
+            player.send_message(ColorFormat.YELLOW + "You have no pending teleport requests.")
+            return
+
+        source = self.server.get_player(self.teleport_requests[player.unique_id])
+        if source is not None:
+            source.send_message(ColorFormat.RED + f"{player.name} has denied your teleport request.")
+
+        player.send_message(ColorFormat.DARK_PURPLE + "Teleport request denied.")
+        del self.teleport_requests[player.unique_id]
