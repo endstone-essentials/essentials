@@ -8,4 +8,4 @@ The modern essentials suite for endstone server.
 - [x] `/broadcast` Broadcast message
 - [x] `/tpa` Players teleport to each other
 - [x] `/back` Back to the place where you last died
-- [ ] `/home` Set a home which you can teleport back later
+- [x] `/home` Set a home which you can teleport back later

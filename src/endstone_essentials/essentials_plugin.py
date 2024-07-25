@@ -1,14 +1,17 @@
+import json
+import os
 import uuid
+from pathlib import Path
 
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
-from endstone.event import EventPriority, PlayerDeathEvent, event_handler
+from endstone.event import PlayerDeathEvent, event_handler
+from endstone.level import Location, Level
 from endstone.plugin import Plugin
-from endstone.level import Location
 
 
 class EssentialsPlugin(Plugin):
-    name = "EssentialsPlugin"
+    prefix = "Essentials"
     api_version = "0.4"
 
     commands = {
@@ -19,32 +22,56 @@ class EssentialsPlugin(Plugin):
         },
         "broadcast": {
             "description": "Broadcast a message",
-            "usages": ["/broadcast <message: message>"],
+            "usages": ["/broadcast <text: message>"],
             "aliases": ["bd"],
             "permissions": ["essentials.command.broadcast"]
         },
         "tpa": {
             "description": "Send a teleport request to another player.",
             "usages": ["/tpa <target: player>"],
-            "permissions": ["essentials.command.tpa"],
+            "permissions": ["essentials.command.tpa"]
         },
         "tpaccept": {
             "description": "Accept a teleport request.",
             "usages": ["/tpaccept"],
             "aliases": ["tpac"],
-            "permissions": ["essentials.command.tpaccept"],
+            "permissions": ["essentials.command.tpaccept"]
         },
         "tpdeny": {
             "description": "Deny a teleport request.",
             "usages": ["/tpdeny"],
             "aliases": ["tpd"],
-            "permissions": ["essentials.command.tpdeny"],
+            "permissions": ["essentials.command.tpdeny"]
         },
         "back": {
             "description": "Back to the place where you last died.",
             "usages": ["/back"],
-            "permissions": ["essentials.command.back"],
+            "permissions": ["essentials.command.back"]
         },
+        "addhome": {
+            "description": "Add a home.",
+            "usages": ["/addhome <name: string>"],
+            "aliases": ["ah"],
+            "permissions": ["essentials.command.addhome"]
+        },
+        "home": {
+            "description": "Return to a home.",
+            "usages": ["/home <name: string>"],
+            "aliases": ["h"],
+            "permissions": ["essentials.command.home"]
+        },
+        "listhome": {
+            "description": "List your homes.",
+            "usages": ["/listhome"],
+            "aliases": ["lh"],
+            "permissions": ["essentials.command.listhome"]
+        },
+        "delhome": {
+            "description": "Delete a home.",
+            "usages": ["/delhome <name: string>"],
+            "aliases": ["dh"],
+            "permissions": ["essentials.command.delhome"]
+        }
     }
 
     permissions = {
@@ -57,7 +84,11 @@ class EssentialsPlugin(Plugin):
                 "essentials.command.tpa": True,
                 "essentials.command.tpaccept": True,
                 "essentials.command.tpdeny": True,
-                "essentials.command.back": True
+                "essentials.command.back": True,
+                "essentials.command.addhome": True,
+                "essentials.command.home": True,
+                "essentials.command.listhome": True,
+                "essentials.command.delhome": True
             }
         },
         "essentials.command.fly": {
@@ -83,11 +114,28 @@ class EssentialsPlugin(Plugin):
         "essentials.command.back": {
             "description": "Allow users to use the /back command.",
             "default": True,
+        },
+        "essentials.command.addhome": {
+            "description": "Allow users to use the /addhome command.",
+            "default": True,
+        },
+        "essentials.command.home": {
+            "description": "Allow users to use the /home command.",
+            "default": True,
+        },
+        "essentials.command.listhome": {
+            "description": "Allow users to use the /listhome command.",
+            "default": True,
+        },
+        "essentials.command.delhome": {
+            "description": "Allow users to use the /delhome command.",
+            "default": True,
         }
     }
 
     teleport_requests: dict[uuid.UUID, uuid.UUID] = {}
     last_death_locations: dict[uuid.UUID, Location] = {}
+    homes: dict[uuid.UUID, dict[str, Location]] = {}
 
     def __init__(self):
         super().__init__()
@@ -96,11 +144,46 @@ class EssentialsPlugin(Plugin):
         self.logger.info("Essentials plugin is loaded!")
 
     def on_enable(self) -> None:
+        self.save_default_config()
+        self.load_homes()
         self.register_events(self)
         self.logger.info("Essentials plugin is enabled!")
 
     def on_disable(self) -> None:
+        self.save_homes()
         self.logger.info("Essentials plugin is disabled!")
+
+    def is_command_enabled(self, command: str) -> bool:
+        return self.config.get("commands", {}).get(command)
+
+    def load_homes(self) -> None:
+        path = Path(self.data_folder) / "homes.json"
+        if not path.exists():
+            os.mknod(path)
+            return
+
+        data: dict[str, dict[str, list]]
+        with open(path, "r") as i:
+            data = json.load(i)
+        for player, data_homes in data.items():
+            player_homes: dict[str, Location] = {}
+            for home_name, home_location in data_homes.items():
+                player_homes[home_name] = Location(Level.get_dimension(home_location[0]), float(home_location[1]),
+                                                   float(home_location[2]), float(home_location[3]))
+            self.homes[uuid.UUID(player)] = player_homes
+        return
+
+    def save_homes(self) -> None:
+        data: [str, dict[str, list[str]]] = {}
+        for player, player_homes in self.homes.items():
+            data_homes: dict[str, list[str]] = {}
+            for home_name, home_location in player_homes.items():
+                data_homes[home_name] = [home_location.dimension.type.name, str(home_location.x), str(home_location.y),
+                                         str(home_location.z)]
+            data[str(player)] = data_homes
+        with open(Path(self.data_folder) / "homes.json", "w") as o:
+            json.dump(data, o, indent=4, ensure_ascii=False)
+        return
 
     @event_handler()
     def on_player_death(self, event: PlayerDeathEvent):
@@ -115,25 +198,37 @@ class EssentialsPlugin(Plugin):
 
         match command.name:
             case "fly":
+                if not self.is_command_enabled("fly"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
                 if len(args) != 0:
                     sender.send_error_message("Usage: /fly")
                     return False
 
                 if sender.allow_flight:
                     sender.allow_flight = False
-                    sender.send_message("Turn off flying mode")
+                    sender.send_message(ColorFormat.GREEN + "Turn off flying mode")
                 else:
                     sender.allow_flight = True
-                    sender.send_message("You can now fly")
+                    sender.send_message(ColorFormat.GREEN + "You can now fly")
 
-            case "bd", "broadcast":
+            case "broadcast":
+                if not self.is_command_enabled("broadcast"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
                 if len(args) == 0:
                     sender.send_error_message("You have to send something")
                     return False
 
-                self.server.broadcast_message(" ".join(args))
+                self.server.broadcast_message(args[0])
 
             case "tpa":
+                if not self.is_command_enabled("tpa"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
                 if len(args) != 1:
                     sender.send_error_message("Usage: /tpa <player>")
                     return True
@@ -147,12 +242,24 @@ class EssentialsPlugin(Plugin):
                 self.handle_teleport_request(sender, target)
 
             case "tpaccept":
+                if not self.is_command_enabled("tpa"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
                 self.accept_teleport_request(sender)
 
             case "tpdeny":
+                if not self.is_command_enabled("tpa"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
                 self.deny_teleport_request(sender)
 
             case "back":
+                if not self.is_command_enabled("back"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
                 if len(args) != 0:
                     sender.send_error_message("Usage: /back")
                     return False
@@ -162,10 +269,75 @@ class EssentialsPlugin(Plugin):
                     return False
 
                 location = self.last_death_locations[sender.unique_id]
-                # TODO(api): replace with player.teleport
-                self.server.dispatch_command(self.server.command_sender, f'execute as "{sender.name}" in {location.dimension.type.name.lower()} run tp @s {location.x} {location.y} {location.z}')
-                sender.send_message("You have been teleported to the last place of death")
+                self.teleport_to_location(sender, location)
+                sender.send_message(ColorFormat.GREEN + "You have been teleported to the last place of death")
 
+            case "addhome":
+                if not self.is_command_enabled("home"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
+                if len(args) != 1:
+                    sender.send_error_message("Usage: /addhome <name: string>")
+                    return False
+
+                player_homes = self.homes.get(sender.unique_id, {})
+                player_homes[args[0]] = sender.location
+                self.homes[sender.unique_id] = player_homes
+                sender.send_message(
+                    ColorFormat.GREEN + f"Successfully create home {args[0]} at location {sender.location.dimension.type.name}, {sender.location.x}, {sender.location.y}, {sender.location.z}")
+
+            case "home":
+                if not self.is_command_enabled("home"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
+                if len(args) != 1:
+                    sender.send_error_message("Usage: /home <name: string>")
+                    return False
+
+                if sender.unique_id not in self.homes or args[0] not in self.homes[sender.unique_id]:
+                    sender.send_error_message("This home doesn't exist")
+                    return False
+
+                location = self.homes[sender.unique_id][args[0]]
+                self.teleport_to_location(sender, location)
+                sender.send_message(ColorFormat.GREEN + f"You have been teleport to home {args[0]}")
+
+            case "listhome":
+                if not self.is_command_enabled("home"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
+                if len(args) != 0:
+                    sender.send_error_message("Usage: /listhome")
+                    return False
+
+                if sender.unique_id not in self.homes or len(self.homes[sender.unique_id]) == 0:
+                    sender.send_error_message("You don't have any home")
+                    return True
+
+                player_homes = self.homes[sender.unique_id]
+                sender.send_message(f"You have {len(player_homes)} homes:")
+                for name, location in player_homes.items():
+                    sender.send_message(
+                        f" - {name}: {location.dimension.type.name}, {location.x}, {location.y}, {location.z}")
+
+            case "delhome":
+                if not self.is_command_enabled("home"):
+                    sender.send_error_message("This command is not enabled")
+                    return False
+
+                if len(args) != 1:
+                    sender.send_error_message("Usage: /delhome <name: string>")
+                    return False
+
+                if sender.unique_id not in self.homes or args[0] not in self.homes[sender.unique_id]:
+                    sender.send_error_message("This home doesn't exist")
+                    return False
+
+                del self.homes[sender.unique_id][args[0]]
+                sender.send_message(ColorFormat.GREEN + f"You have deleted home {args[0]}")
         return True
 
     def handle_teleport_request(self, player: Player, target: Player) -> None:
@@ -187,8 +359,7 @@ class EssentialsPlugin(Plugin):
         if source is None:
             player.send_message(ColorFormat.YELLOW + "The player who sent the teleport request is no longer online.")
         else:
-            # TODO(api): replace with player.teleport
-            self.server.dispatch_command(self.server.command_sender, f'tp "{source.name}" "{player.name}"')
+            self.teleport_to_player(source, player)
             source.send_message(ColorFormat.GREEN + f"You have been teleported to {player.name}.")
             player.send_message(ColorFormat.GREEN + "Teleport request accepted.")
 
@@ -205,3 +376,12 @@ class EssentialsPlugin(Plugin):
 
         player.send_message(ColorFormat.DARK_PURPLE + "Teleport request denied.")
         del self.teleport_requests[player.unique_id]
+
+    def teleport_to_player(self, source: Player, player: Player):
+        # TODO(api): replace with player.teleport
+        self.server.dispatch_command(self.server.command_sender, f'tp "{source.name}" "{player.name}"')
+
+    def teleport_to_location(self, player: Player, location: Location):
+        # TODO(api): replace with player.teleport
+        self.server.dispatch_command(self.server.command_sender,
+                                     f'execute as "{player.name}" in {location.dimension.type.name.lower()} run tp @s {location.x} {location.y} {location.z}')
