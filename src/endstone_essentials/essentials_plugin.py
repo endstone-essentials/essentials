@@ -96,6 +96,7 @@ class EssentialsPlugin(Plugin):
         self.logger.info("Essentials plugin is loaded!")
 
     def on_enable(self) -> None:
+        self.register_events(self)
         self.logger.info("Essentials plugin is enabled!")
 
     def on_disable(self) -> None:
@@ -104,6 +105,7 @@ class EssentialsPlugin(Plugin):
     @event_handler()
     def on_player_death(self, event: PlayerDeathEvent):
         self.last_death_locations[event.player.unique_id] = event.player.location
+        event.player.send_message("You can use the /back command to return to the place of death")
         return
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
@@ -160,7 +162,8 @@ class EssentialsPlugin(Plugin):
                     return False
 
                 location = self.last_death_locations[sender.unique_id]
-                self.server.dispatch_command(self.server.command_sender, f'execute as "{sender.name}" in "{location.dimension.type.name}" run tp @s "{location.x}" "{location.y}" "{location.z}"')
+                # TODO(api): replace with player.teleport
+                self.server.dispatch_command(self.server.command_sender, f'execute as "{sender.name}" in {location.dimension.type.name.lower()} run tp @s {location.x} {location.y} {location.z}')
                 sender.send_message("You have been teleported to the last place of death")
 
         return True

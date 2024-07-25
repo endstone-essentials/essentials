@@ -162,3 +162,4 @@ cython_debug/
 # Wheels
 wheelhouse/
 /test/
+/build_plugin.ps1
