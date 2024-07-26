@@ -14,7 +14,7 @@ from endstone.plugin import Plugin
 # TODO(endstone): consider making this part of endstone api?
 def load_from_yaml(filename):
     def decorator(cls):
-        with (Path(__file__).parent / filename).open('r') as file:
+        with (Path(__file__).parent / filename).open("r") as file:
             data = yaml.safe_load(file)
         for key, value in data.items():
             setattr(cls, key, value)
@@ -23,7 +23,7 @@ def load_from_yaml(filename):
     return decorator
 
 
-@load_from_yaml('plugin.yml')
+@load_from_yaml("plugin.yml")
 class EssentialsPlugin(Plugin):
     teleport_requests: dict[uuid.UUID, uuid.UUID] = {}
     last_death_locations: dict[uuid.UUID, Location] = {}
@@ -52,8 +52,12 @@ class EssentialsPlugin(Plugin):
         for player, data_homes in data.items():
             player_homes: dict[str, Location] = {}
             for home_name, home_location in data_homes.items():
-                player_homes[home_name] = Location(Level.get_dimension(home_location[0]), float(home_location[1]),
-                                                   float(home_location[2]), float(home_location[3]))
+                player_homes[home_name] = Location(
+                    Level.get_dimension(home_location[0]),
+                    float(home_location[1]),
+                    float(home_location[2]),
+                    float(home_location[3]),
+                )
             self.homes[uuid.UUID(player)] = player_homes
         return
 
@@ -62,8 +66,12 @@ class EssentialsPlugin(Plugin):
         for player, player_homes in self.homes.items():
             data_homes: dict[str, list[str]] = {}
             for home_name, home_location in player_homes.items():
-                data_homes[home_name] = [home_location.dimension.type.name, str(home_location.x), str(home_location.y),
-                                         str(home_location.z)]
+                data_homes[home_name] = [
+                    home_location.dimension.type.name,
+                    str(home_location.x),
+                    str(home_location.y),
+                    str(home_location.z),
+                ]
             data[str(player)] = data_homes
         with open(Path(self.data_folder) / "homes.json", "w") as o:
             json.dump(data, o, indent=4, ensure_ascii=False)
@@ -117,7 +125,7 @@ class EssentialsPlugin(Plugin):
                     sender.send_error_message("Usage: /tpa <player>")
                     return True
 
-                player_name = args[0].strip('\"')
+                player_name = args[0].strip('"')
                 target = self.server.get_player(player_name)
                 if target is None:
                     sender.send_message(f"Player {player_name} not found.")
@@ -169,7 +177,9 @@ class EssentialsPlugin(Plugin):
                 player_homes[args[0]] = sender.location
                 self.homes[sender.unique_id] = player_homes
                 sender.send_message(
-                    ColorFormat.GREEN + f"Successfully create home {args[0]} at location {sender.location.dimension.type.name}, {sender.location.x}, {sender.location.y}, {sender.location.z}")
+                    ColorFormat.GREEN
+                    + f"Successfully create home {args[0]} at location {sender.location.dimension.type.name}, {sender.location.x}, {sender.location.y}, {sender.location.z}"
+                )
 
             case "home":
                 if not self.is_command_enabled("home"):
@@ -205,7 +215,8 @@ class EssentialsPlugin(Plugin):
                 sender.send_message(f"You have {len(player_homes)} homes:")
                 for name, location in player_homes.items():
                     sender.send_message(
-                        f" - {name}: {location.dimension.type.name}, {location.x}, {location.y}, {location.z}")
+                        f" - {name}: {location.dimension.type.name}, {location.x}, {location.y}, {location.z}"
+                    )
 
             case "delhome":
                 if not self.is_command_enabled("home"):
@@ -231,8 +242,9 @@ class EssentialsPlugin(Plugin):
 
         self.teleport_requests[target.unique_id] = player.unique_id
         player.send_message(ColorFormat.GREEN + f"Teleport request sent to {target.name}.")
-        target.send_message(ColorFormat.GREEN + f"{player.name} has sent you a teleport request. "
-                                                f"Use /tpaccept or /tpdeny.")
+        target.send_message(
+            ColorFormat.GREEN + f"{player.name} has sent you a teleport request. " f"Use /tpaccept or /tpdeny."
+        )
 
     def accept_teleport_request(self, player: Player) -> None:
         if player.unique_id not in self.teleport_requests:
@@ -267,5 +279,7 @@ class EssentialsPlugin(Plugin):
 
     def teleport_to_location(self, player: Player, location: Location):
         # TODO(api): replace with player.teleport
-        self.server.dispatch_command(self.server.command_sender,
-                                     f'execute as "{player.name}" in {location.dimension.type.name.lower()} run tp @s {location.x} {location.y} {location.z}')
+        self.server.dispatch_command(
+            self.server.command_sender,
+            f'execute as "{player.name}" in {location.dimension.type.name.lower()} run tp @s {location.x} {location.y} {location.z}',
+        )
