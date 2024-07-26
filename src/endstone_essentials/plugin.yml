@@ -31,12 +31,12 @@ commands:
     permissions: [ "essentials.command.back" ]
   addhome:
     description: "Add a home."
-    usages: [ "/addhome <name: string>" ]
+    usages: [ "/addhome" ]
     aliases: [ "ah" ]
     permissions: [ "essentials.command.addhome" ]
   home:
     description: "Return to a home."
-    usages: [ "/home <name: string>" ]
+    usages: [ "/home" ]
     aliases: [ "h" ]
     permissions: [ "essentials.command.home" ]
   listhome:
@@ -46,7 +46,7 @@ commands:
     permissions: [ "essentials.command.listhome" ]
   delhome:
     description: "Delete a home."
-    usages: [ "/delhome <name: string>" ]
+    usages: [ "/delhome" ]
     aliases: [ "dh" ]
     permissions: [ "essentials.command.delhome" ]
 
