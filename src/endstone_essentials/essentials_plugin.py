@@ -3,6 +3,7 @@ import os
 import uuid
 from pathlib import Path
 
+import yaml
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
 from endstone.event import PlayerDeathEvent, event_handler
@@ -10,148 +11,31 @@ from endstone.level import Location, Level
 from endstone.plugin import Plugin
 
 
+# TODO(endstone): consider making this part of endstone api?
+def load_from_yaml(filename):
+    def decorator(cls):
+        with (Path(__file__).parent / filename).open('r') as file:
+            data = yaml.safe_load(file)
+        for key, value in data.items():
+            setattr(cls, key, value)
+        return cls
+
+    return decorator
+
+
+@load_from_yaml('plugin.yml')
 class EssentialsPlugin(Plugin):
-    prefix = "Essentials"
-    api_version = "0.4"
-
-    commands = {
-        "fly": {
-            "description": "Switch flying mode",
-            "usages": ["/fly"],
-            "permissions": ["essentials.command.fly"]
-        },
-        "broadcast": {
-            "description": "Broadcast a message",
-            "usages": ["/broadcast <text: message>"],
-            "aliases": ["bd"],
-            "permissions": ["essentials.command.broadcast"]
-        },
-        "tpa": {
-            "description": "Send a teleport request to another player.",
-            "usages": ["/tpa <target: player>"],
-            "permissions": ["essentials.command.tpa"]
-        },
-        "tpaccept": {
-            "description": "Accept a teleport request.",
-            "usages": ["/tpaccept"],
-            "aliases": ["tpac"],
-            "permissions": ["essentials.command.tpaccept"]
-        },
-        "tpdeny": {
-            "description": "Deny a teleport request.",
-            "usages": ["/tpdeny"],
-            "aliases": ["tpd"],
-            "permissions": ["essentials.command.tpdeny"]
-        },
-        "back": {
-            "description": "Back to the place where you last died.",
-            "usages": ["/back"],
-            "permissions": ["essentials.command.back"]
-        },
-        "addhome": {
-            "description": "Add a home.",
-            "usages": ["/addhome <name: string>"],
-            "aliases": ["ah"],
-            "permissions": ["essentials.command.addhome"]
-        },
-        "home": {
-            "description": "Return to a home.",
-            "usages": ["/home <name: string>"],
-            "aliases": ["h"],
-            "permissions": ["essentials.command.home"]
-        },
-        "listhome": {
-            "description": "List your homes.",
-            "usages": ["/listhome"],
-            "aliases": ["lh"],
-            "permissions": ["essentials.command.listhome"]
-        },
-        "delhome": {
-            "description": "Delete a home.",
-            "usages": ["/delhome <name: string>"],
-            "aliases": ["dh"],
-            "permissions": ["essentials.command.delhome"]
-        }
-    }
-
-    permissions = {
-        "essentials.command": {
-            "description": "Allow users to use all commands provided by this plugin.",
-            "default": True,
-            "children": {
-                "essentials.command.fly": True,
-                "essentials.command.broadcast": True,
-                "essentials.command.tpa": True,
-                "essentials.command.tpaccept": True,
-                "essentials.command.tpdeny": True,
-                "essentials.command.back": True,
-                "essentials.command.addhome": True,
-                "essentials.command.home": True,
-                "essentials.command.listhome": True,
-                "essentials.command.delhome": True
-            }
-        },
-        "essentials.command.fly": {
-            "description": "Allow users to use the /fly command.",
-            "default": True,
-        },
-        "essentials.command.broadcast": {
-            "description": "Allow users to use the /broadcast command.",
-            "default": True,
-        },
-        "essentials.command.tpa": {
-            "description": "Allow users to use the /tpa command.",
-            "default": True,
-        },
-        "essentials.command.tpaccept": {
-            "description": "Allow users to use the /tpaccept command.",
-            "default": True,
-        },
-        "essentials.command.tpdeny": {
-            "description": "Allow users to use the /tpdeny command.",
-            "default": True,
-        },
-        "essentials.command.back": {
-            "description": "Allow users to use the /back command.",
-            "default": True,
-        },
-        "essentials.command.addhome": {
-            "description": "Allow users to use the /addhome command.",
-            "default": True,
-        },
-        "essentials.command.home": {
-            "description": "Allow users to use the /home command.",
-            "default": True,
-        },
-        "essentials.command.listhome": {
-            "description": "Allow users to use the /listhome command.",
-            "default": True,
-        },
-        "essentials.command.delhome": {
-            "description": "Allow users to use the /delhome command.",
-            "default": True,
-        }
-    }
-
     teleport_requests: dict[uuid.UUID, uuid.UUID] = {}
     last_death_locations: dict[uuid.UUID, Location] = {}
     homes: dict[uuid.UUID, dict[str, Location]] = {}
-
-    def __init__(self):
-        super().__init__()
-
-    def on_load(self) -> None:
-        self.logger.info("Essentials plugin is loaded!")
 
     def on_enable(self) -> None:
         self.save_default_config()
         self.load_homes()
         self.register_events(self)
-        self.logger.info("Essentials plugin is enabled!")
 
     def on_disable(self) -> None:
         self.save_homes()
-        self.logger.info("Essentials plugin is disabled!")
 
     def is_command_enabled(self, command: str) -> bool:
         return self.config.get("commands", {}).get(command)

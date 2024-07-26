@@ -1,0 +1,97 @@
+prefix: "Essentials"
+api_version: "0.4"
+
+commands:
+  fly:
+    description: "Switch flying mode"
+    usages: [ "/fly" ]
+    permissions: [ "essentials.command.fly" ]
+  broadcast:
+    description: "Broadcast a message"
+    usages: [ "/broadcast <text: message>" ]
+    aliases: [ "bd" ]
+    permissions: [ "essentials.command.broadcast" ]
+  tpa:
+    description: "Send a teleport request to another player."
+    usages: [ "/tpa <target: player>" ]
+    permissions: [ "essentials.command.tpa" ]
+  tpaccept:
+    description: "Accept a teleport request."
+    usages: [ "/tpaccept" ]
+    aliases: [ "tpac" ]
+    permissions: [ "essentials.command.tpaccept" ]
+  tpdeny:
+    description: "Deny a teleport request."
+    usages: [ "/tpdeny" ]
+    aliases: [ "tpd" ]
+    permissions: [ "essentials.command.tpdeny" ]
+  back:
+    description: "Back to the place where you last died."
+    usages: [ "/back" ]
+    permissions: [ "essentials.command.back" ]
+  addhome:
+    description: "Add a home."
+    usages: [ "/addhome <name: string>" ]
+    aliases: [ "ah" ]
+    permissions: [ "essentials.command.addhome" ]
+  home:
+    description: "Return to a home."
+    usages: [ "/home <name: string>" ]
+    aliases: [ "h" ]
+    permissions: [ "essentials.command.home" ]
+  listhome:
+    description: "List your homes."
+    usages: [ "/listhome" ]
+    aliases: [ "lh" ]
+    permissions: [ "essentials.command.listhome" ]
+  delhome:
+    description: "Delete a home."
+    usages: [ "/delhome <name: string>" ]
+    aliases: [ "dh" ]
+    permissions: [ "essentials.command.delhome" ]
+
+permissions:
+  essentials.command:
+    description: "Allow users to use all commands provided by this plugin."
+    default: true
+    children:
+      essentials.command.fly: true
+      essentials.command.broadcast: true
+      essentials.command.tpa: true
+      essentials.command.tpaccept: true
+      essentials.command.tpdeny: true
+      essentials.command.back: true
+      essentials.command.addhome: true
+      essentials.command.home: true
+      essentials.command.listhome: true
+      essentials.command.delhome: true
+  essentials.command.fly:
+    description: "Allow users to use the /fly command."
+    default: true
+  essentials.command.broadcast:
+    description: "Allow users to use the /broadcast command."
+    default: true
+  essentials.command.tpa:
+    description: "Allow users to use the /tpa command."
+    default: true
+  essentials.command.tpaccept:
+    description: "Allow users to use the /tpaccept command."
+    default: true
+  essentials.command.tpdeny:
+    description: "Allow users to use the /tpdeny command."
+    default: true
+  essentials.command.back:
+    description: "Allow users to use the /back command."
+    default: true
+  essentials.command.addhome:
+    description: "Allow users to use the /addhome command."
+    default: true
+  essentials.command.home:
+    description: "Allow users to use the /home command."
+    default: true
+  essentials.command.listhome:
+    description: "Allow users to use the /listhome command."
+    default: true
+  essentials.command.delhome:
+    description: "Allow users to use the /delhome command."
+    default: true
