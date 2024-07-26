@@ -36,7 +36,7 @@ class EssentialsPlugin(Plugin):
         self.register_command("broadcast", BroadcastCommandExecutor(self))
         self.register_command("fly", FlyCommandExecutor(self))
         self.register_command(["home", "addhome", "delhome", "listhome"], HomeCommandExecutors(self))
-        self.register_command(["tpa", "tpaccept", "tpdeny"], BroadcastCommandExecutor(self))
+        self.register_command(["tpa", "tpaccept", "tpdeny"], TpaCommandExecutor(self))
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not self.is_command_enabled(command.name):

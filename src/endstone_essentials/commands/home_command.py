@@ -28,13 +28,14 @@ class HomeCommandExecutors(CommandExecutorBase):
 
         match command.name:
             case "home":
-                if sender.unique_id not in self.homes:
+                player_homes = self.homes.get(sender.unique_id, {})
+                if len(player_homes) == 0:
                     sender.send_error_message("You don't have any home. Use /addhome to add a home.")
                     return False
 
                 def on_submit(player: Player, json_str: str) -> None:
                     index = int(json.loads(json_str)[0])
-                    home, location = list(self.homes[player.unique_id].items())[index]
+                    home, location = list(player_homes.items())[index]
                     self.plugin.teleport_to_location(player, location)
                     player.send_message(ColorFormat.GREEN + f"You have been teleport to home {home}")
 
@@ -42,9 +43,9 @@ class HomeCommandExecutors(CommandExecutorBase):
                     ModalForm(
                         title="Back to home",
                         controls=[
-                            Dropdown(label="Name", options=list(self.homes[sender.unique_id])),
+                            Dropdown(label="Name", options=list(player_homes)),
                         ],
-                        submit_button=ColorFormat.RED + ColorFormat.AQUA + "Teleport",
+                        submit_button=ColorFormat.DARK_AQUA + ColorFormat.BOLD + "Go home",
                         on_submit=on_submit,
                     )
                 )
@@ -100,11 +101,11 @@ class HomeCommandExecutors(CommandExecutorBase):
                     )
                 )
             case "listhome":
-                if sender.unique_id not in self.homes:
+                player_homes = self.homes.get(sender.unique_id, {})
+                if len(player_homes) == 0:
                     sender.send_error_message("You don't have any home. Use /addhome to add a home.")
                     return False
 
-                player_homes = self.homes[sender.unique_id]
                 sender.send_message(f"You have {len(player_homes)} homes:")
                 for name, location in player_homes.items():
                     sender.send_message(
