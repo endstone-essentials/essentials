@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from endstone import Player, ColorFormat
 from endstone.command import *
 from endstone.form import *
@@ -54,20 +52,12 @@ class NoticeCommandExecutors(CommandExecutorBase):
         return True
 
     def load_notice(self) -> None:
-        path = Path(self.plugin.data_folder) / "notice.txt"
-        if not path.exists():
-            return
-
-        with path.open("r") as f:
-            self.notice_title = f.readline().replace("\n", "")
-            self.notice_button = f.readline().replace("\n", "")
-            self.notice_body = f.read()
+        self.notice_title = self.plugin.config["notice"]["title"]
+        self.notice_button = self.plugin.config["notice"]["button"]
+        self.notice_body = self.plugin.config["notice"]["body"]
 
     def save_notice(self) -> None:
-        path = Path(self.plugin.data_folder) / "notice.txt"
-        with path.open("w") as f:
-            f.write(self.notice_title)
-            f.write("\n")
-            f.write(self.notice_button)
-            f.write("\n")
-            f.write(self.notice_body)
+        self.plugin.config["notice"]["title"] = self.notice_title
+        self.plugin.config["notice"]["body"] = self.notice_body
+        self.plugin.config["notice"]["button"] = self.notice_button
+        self.plugin.save_config()
