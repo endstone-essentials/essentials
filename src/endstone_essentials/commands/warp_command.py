@@ -22,7 +22,7 @@ class WarpCommandExecutors(CommandExecutorBase):
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not isinstance(sender, Player):
             sender.send_error_message("This command can only be executed by a player")
-            return True
+            return False
 
         match command.name:
             case "warp":
@@ -63,7 +63,7 @@ class WarpCommandExecutors(CommandExecutorBase):
                     self.save_warps()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create warp {warp} at "
-                                            f"{location.dimension.type.name}, {round(location.x, 1)}, {round(location.y, 1)}, {round(location.z, 1)}"
+                                            f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
                 sender.send_form(
@@ -108,7 +108,7 @@ class WarpCommandExecutors(CommandExecutorBase):
                 sender.send_message(f"There are {len(self.warps)} warps:")
                 for name, location in self.warps.items():
                     sender.send_message(
-                        f" - {name}: {location.dimension.type.name}, {round(location.x, 1)}, {round(location.y, 1)}, {round(location.z, 1)}"
+                        f" - {name}: {location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
         return True

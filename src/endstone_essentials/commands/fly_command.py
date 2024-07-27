@@ -8,7 +8,7 @@ class FlyCommandExecutor(CommandExecutorBase):
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not isinstance(sender, Player):
             sender.send_error_message("This command can only be executed by a player")
-            return True
+            return False
 
         if len(args) == 0:
             target = sender

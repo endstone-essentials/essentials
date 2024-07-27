@@ -24,7 +24,7 @@ class HomeCommandExecutors(CommandExecutorBase):
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not isinstance(sender, Player):
             sender.send_error_message("This command can only be executed by a player")
-            return True
+            return False
 
         match command.name:
             case "home":
@@ -68,7 +68,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                     self.save_homes()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create home {home} at "
-                                            f"{location.dimension.type.name}, {round(location.x, 1)}, {round(location.y, 1)}, {round(location.z, 1)}"
+                                            f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
                 sender.send_form(
@@ -115,7 +115,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                 sender.send_message(f"You have {len(player_homes)} homes:")
                 for name, location in player_homes.items():
                     sender.send_message(
-                        f" - {name}: {location.dimension.type.name}, {round(location.x, 1)}, {round(location.y, 1)}, {round(location.z, 1)}"
+                        f" - {name}: {location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
         return True

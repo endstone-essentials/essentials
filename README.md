@@ -10,3 +10,4 @@ The modern essentials suite for endstone server.
 - [x] `/back` Back to the place where you last died
 - [x] `/home` Set a home which you can teleport back later
 - [x] `/warp` Warp command
+- [x] `/notice` View server announcements

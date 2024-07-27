@@ -38,6 +38,7 @@ class EssentialsPlugin(Plugin):
         self.register_command(["home", "addhome", "delhome", "listhome"], HomeCommandExecutors(self))
         self.register_command(["warp", "addwarp", "delwarp", "listwarp"], WarpCommandExecutors(self))
         self.register_command(["tpa", "tpaccept", "tpdeny"], TpaCommandExecutor(self))
+        self.register_command(["notice", "setnotice"], NoticeCommandExecutors(self))
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not self.is_command_enabled(command.name):

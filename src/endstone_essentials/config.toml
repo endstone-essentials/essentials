@@ -5,5 +5,4 @@ tpa = true
 back = true
 home = true
 warp = true
-
-[warps]
+notice = true

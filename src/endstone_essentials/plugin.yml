@@ -58,13 +58,21 @@ commands:
     usages: [ "/addwarp" ]
     permissions: [ "essentials.command.addwarp" ]
   listwarp:
-    description: "Add a warp"
+    description: "List all warps"
     usages: [ "/listwarp" ]
     permissions: [ "essentials.command.listwarp" ]
   delwarp:
-    description: "Add a warp"
+    description: "Delete a warp"
     usages: [ "/delwarp" ]
     permissions: [ "essentials.command.delwarp" ]
+  notice:
+    description: "See the server notice"
+    usages: [ "/notice" ]
+    permissions: [ "essentials.command.notice" ]
+  setnotice:
+    description: "Set the server notice"
+    usages: [ "/setnotice <title: string> <button: string> <body: message>" ]
+    permissions: [ "essentials.command.setnotice" ]
 
 permissions:
   essentials.command:
@@ -85,6 +93,8 @@ permissions:
       essentials.command.addwarp: true
       essentials.command.listwarp: true
       essentials.command.delwarp: true
+      essentials.command.notice: true
+      essentials.command.setnotice: true
   essentials.command.fly:
     description: "Allow users to use the /fly command."
     default: op
@@ -126,4 +136,10 @@ permissions:
     default: true
   essentials.command.delwarp:
     description: "Allow users to use the /warp command."
+    default: op
+  essentials.command.notice:
+    description: "Allow users to use the /notice command."
+    default: true
+  essentials.command.setnotice:
+    description: "Allow users to use the /setnotice command."
     default: op
