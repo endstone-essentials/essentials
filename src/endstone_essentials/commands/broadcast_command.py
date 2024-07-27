@@ -1,3 +1,4 @@
+from endstone import ColorFormat
 from endstone.command import Command, CommandSender
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
@@ -9,5 +10,6 @@ class BroadcastCommandExecutor(CommandExecutorBase):
         if len(args) == 0:
             return False  # return false to send usage
 
-        self.plugin.server.broadcast_message(str(args[0]))
+        self.plugin.server.broadcast_message(f"{ColorFormat.BOLD}{ColorFormat.RED}[Broadcast] "
+                                             f"{ColorFormat.RESET}{ColorFormat.GREEN}{args[0]}")
         return True
