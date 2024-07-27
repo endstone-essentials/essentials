@@ -24,7 +24,12 @@ class TpaCommandExecutor(CommandExecutorBase):
         match [command.name] + args:
             case ["tpa", player_name]:
                 player_name = player_name.strip('"')  # remove the leading and trailing quotes
-                target = self.plugin.server.get_player(player_name)
+                if player_name == "@s" or player_name == sender.name:
+                    sender.send_error_message("You can only teleport to a player other than yourself")
+                    return True
+                else:
+                    target = self.plugin.server.get_player(player_name)
+
                 if target is None:
                     sender.send_error_message(f"Player {player_name} not found.")
                     return True
