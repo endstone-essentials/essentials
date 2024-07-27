@@ -32,7 +32,7 @@ commands:
   addhome:
     description: "Add a home."
     usages: [ "/addhome" ]
-    aliases: [ "ah" ]
+    aliases: [ "ah", "sethome" ]
     permissions: [ "essentials.command.addhome" ]
   home:
     description: "Return to a home."

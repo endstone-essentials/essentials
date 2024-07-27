@@ -84,13 +84,14 @@ class HomeCommandExecutors(CommandExecutorBase):
                 )
 
             case "delhome":
-                if sender.unique_id not in self.homes:
+                player_homes = self.homes.get(sender.unique_id, {})
+                if len(player_homes) == 0:
                     sender.send_error_message("You don't have any home. Use /addhome to add a home.")
                     return False
 
                 def on_submit(player: Player, json_str: str) -> None:
                     index = int(json.loads(json_str)[0])
-                    home = list(self.homes[player.unique_id])[index]
+                    home = list(player_homes)[index]
                     del self.homes[player.unique_id][home]
                     self.save_homes()
                     player.send_message(ColorFormat.RED + f"You have deleted home {home}")
@@ -99,7 +100,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                     ModalForm(
                         title="Delete a home",
                         controls=[
-                            Dropdown(label="Name", options=list(self.homes[sender.unique_id])),
+                            Dropdown(label="Name", options=list(player_homes)),
                         ],
                         submit_button=ColorFormat.RED + ColorFormat.BOLD + "Delete",
                         on_submit=on_submit,
