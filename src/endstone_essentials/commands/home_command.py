@@ -53,19 +53,24 @@ class HomeCommandExecutors(CommandExecutorBase):
             case "addhome":
 
                 def on_submit(player: Player, json_str: str) -> None:
-                    home = str(json.loads(json_str)[0])
+                    home = str(json.loads(json_str)[0]).strip()
+                    if len(home) == 0:
+                        sender.send_error_message(f"Invalid home name")
+                        return
+
                     location = player.location
                     player_homes = self.homes.get(sender.unique_id, {})
                     if home in player_homes:
-                        sender.send_message(ColorFormat.RED + f"Home {home} already exists.")
-                    else:
-                        player_homes[home] = location
-                        self.homes[sender.unique_id] = player_homes
-                        self.save_homes()
-                        sender.send_message(
-                            ColorFormat.GREEN + f"Successfully create home {home} at "
-                            f"{location.dimension.type.name}, {location.x}, {location.y}, {location.z}"
-                        )
+                        sender.send_error_message(f"Home {home} already exists.")
+                        return
+
+                    player_homes[home] = location
+                    self.homes[sender.unique_id] = player_homes
+                    self.save_homes()
+                    sender.send_message(
+                        ColorFormat.GREEN + f"Successfully create home {home} at "
+                                            f"{location.dimension.type.name}, {location.x}, {location.y}, {location.z}"
+                    )
 
                 sender.send_form(
                     ModalForm(
@@ -73,7 +78,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                         controls=[
                             TextInput(label="Name", placeholder="Home"),
                         ],
-                        submit_button=ColorFormat.RED + ColorFormat.GREEN + "Add",
+                        submit_button=ColorFormat.DARK_GREEN + ColorFormat.BOLD + "Add",
                         on_submit=on_submit,
                     )
                 )
