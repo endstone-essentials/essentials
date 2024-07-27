@@ -4,7 +4,7 @@ api_version: "0.4"
 commands:
   fly:
     description: "Switch flying mode"
-    usages: [ "/fly" ]
+    usages: [ "/fly [player: player]" ]
     permissions: [ "essentials.command.fly" ]
   broadcast:
     description: "Broadcast a message"
@@ -53,7 +53,7 @@ commands:
 permissions:
   essentials.command:
     description: "Allow users to use all commands provided by this plugin."
-    default: true
+    default: op
     children:
       essentials.command.fly: true
       essentials.command.broadcast: true
@@ -67,10 +67,10 @@ permissions:
       essentials.command.delhome: true
   essentials.command.fly:
     description: "Allow users to use the /fly command."
-    default: true
+    default: op
   essentials.command.broadcast:
     description: "Allow users to use the /broadcast command."
-    default: true
+    default: op
   essentials.command.tpa:
     description: "Allow users to use the /tpa command."
     default: true

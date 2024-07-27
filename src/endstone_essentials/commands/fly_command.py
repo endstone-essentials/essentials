@@ -10,11 +10,23 @@ class FlyCommandExecutor(CommandExecutorBase):
             sender.send_error_message("This command can only be executed by a player")
             return True
 
-        if sender.allow_flight:
-            sender.allow_flight = False
-            sender.send_message(ColorFormat.DARK_RED + "You are no longer allowed to fly")
+        if len(args) == 0:
+            target = sender
         else:
-            sender.allow_flight = True
-            sender.send_message(ColorFormat.GREEN + "You are now allowed to fly")
+            player_name = args[0].strip('"')  # remove the leading and trailing quotes
+            if player_name == "@s":
+                target = sender
+            else:
+                target = self.plugin.server.get_player(player_name)
+                if target is None:
+                    sender.send_error_message(f"Player {player_name} not found.")
+                    return True
+
+        if target.allow_flight:
+            target.allow_flight = False
+            target.send_message(ColorFormat.DARK_RED + "You are no longer allowed to fly")
+        else:
+            target.allow_flight = True
+            target.send_message(ColorFormat.GREEN + "You are now allowed to fly")
 
         return True
