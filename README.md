@@ -9,3 +9,4 @@ The modern essentials suite for endstone server.
 - [x] `/tpa` Players teleport to each other
 - [x] `/back` Back to the place where you last died
 - [x] `/home` Set a home which you can teleport back later
+- [x] `/warp` Warp command

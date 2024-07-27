@@ -49,6 +49,22 @@ commands:
     usages: [ "/delhome" ]
     aliases: [ "dh" ]
     permissions: [ "essentials.command.delhome" ]
+  warp:
+    description: "Teleport to a warp"
+    usages: [ "/warp" ]
+    permissions: [ "essentials.command.warp" ]
+  addwarp:
+    description: "Add a warp"
+    usages: [ "/addwarp" ]
+    permissions: [ "essentials.command.addwarp" ]
+  listwarp:
+    description: "Add a warp"
+    usages: [ "/listwarp" ]
+    permissions: [ "essentials.command.listwarp" ]
+  delwarp:
+    description: "Add a warp"
+    usages: [ "/delwarp" ]
+    permissions: [ "essentials.command.delwarp" ]
 
 permissions:
   essentials.command:
@@ -65,6 +81,10 @@ permissions:
       essentials.command.home: true
       essentials.command.listhome: true
       essentials.command.delhome: true
+      essentials.command.warp: true
+      essentials.command.addwarp: true
+      essentials.command.listwarp: true
+      essentials.command.delwarp: true
   essentials.command.fly:
     description: "Allow users to use the /fly command."
     default: op
@@ -95,3 +115,15 @@ permissions:
   essentials.command.delhome:
     description: "Allow users to use the /delhome command."
     default: true
+  essentials.command.warp:
+    description: "Allow users to use the /warp command."
+    default: true
+  essentials.command.addwarp:
+    description: "Allow users to use the /warp command."
+    default: op
+  essentials.command.listwarp:
+    description: "Allow users to use the /warp command."
+    default: true
+  essentials.command.delwarp:
+    description: "Allow users to use the /warp command."
+    default: op

@@ -51,7 +51,6 @@ class HomeCommandExecutors(CommandExecutorBase):
                 )
 
             case "addhome":
-
                 def on_submit(player: Player, json_str: str) -> None:
                     home = str(json.loads(json_str)[0]).strip()
                     if len(home) == 0:
@@ -69,7 +68,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                     self.save_homes()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create home {home} at "
-                                            f"{location.dimension.type.name}, {location.x}, {location.y}, {location.z}"
+                                            f"{location.dimension.type.name}, {round(location.x, 1)}, {round(location.y, 1)}, {round(location.z, 1)}"
                     )
 
                 sender.send_form(
@@ -106,6 +105,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                         on_submit=on_submit,
                     )
                 )
+
             case "listhome":
                 player_homes = self.homes.get(sender.unique_id, {})
                 if len(player_homes) == 0:
@@ -115,7 +115,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                 sender.send_message(f"You have {len(player_homes)} homes:")
                 for name, location in player_homes.items():
                     sender.send_message(
-                        f" - {name}: {location.dimension.type.name}, {location.x}, {location.y}, {location.z}"
+                        f" - {name}: {location.dimension.type.name}, {round(location.x, 1)}, {round(location.y, 1)}, {round(location.z, 1)}"
                     )
 
         return True
