@@ -6,6 +6,7 @@ back = true
 home = true
 warp = true
 notice = true
+ping = true
 
 [notice]
 title = "Notice"

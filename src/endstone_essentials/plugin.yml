@@ -72,6 +72,10 @@ commands:
     description: "Set the server notice"
     usages: [ "/setnotice <title: string> <button: string> <body: message>" ]
     permissions: [ "essentials.command.setnotice" ]
+  ping:
+    description: "Check a player's ping on the server"
+    usages: [ "/ping [player: player]" ]
+    permission: [ "essentials.command.ping" ]
 
 permissions:
   essentials.command:
@@ -94,6 +98,7 @@ permissions:
       essentials.command.delwarp: true
       essentials.command.notice: true
       essentials.command.setnotice: true
+      essentials.command.ping: true
   essentials.command.fly:
     description: "Allow users to use the /fly command."
     default: op
@@ -141,4 +146,7 @@ permissions:
     default: true
   essentials.command.setnotice:
     description: "Allow users to use the /setnotice command."
+    default: op
+  essentials.command.ping:
+    description: "Allow users to use the /ping command."
     default: op

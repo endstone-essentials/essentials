@@ -7,7 +7,6 @@ from endstone.command import Command, CommandExecutor, CommandSender
 from endstone.event import PlayerDeathEvent, event_handler
 from endstone.level import Location
 from endstone.plugin import Plugin
-
 from endstone_essentials.commands import (
     BackCommandExecutors,
     BroadcastCommandExecutor,
@@ -16,6 +15,7 @@ from endstone_essentials.commands import (
     WarpCommandExecutors,
     TpaCommandExecutor,
     NoticeCommandExecutors,
+    PingCommandExecutor
 )
 
 
@@ -47,6 +47,7 @@ class EssentialsPlugin(Plugin):
         self.register_command(["warp", "addwarp", "delwarp", "listwarp"], WarpCommandExecutors(self))
         self.register_command(["tpa", "tpaccept", "tpdeny"], TpaCommandExecutor(self))
         self.register_command(["notice", "setnotice"], NoticeCommandExecutors(self))
+        self.register_command("ping", PingCommandExecutor(self))
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not self.is_command_enabled(command.name):
