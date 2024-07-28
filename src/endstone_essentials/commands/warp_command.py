@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from endstone import ColorFormat, Player
-from endstone.level import Location
-from endstone.form import *
 from endstone.command import Command, CommandSender
+from endstone.form import ModalForm, Dropdown, TextInput
+from endstone.level import Location
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class WarpCommandExecutors(CommandExecutorBase):
     def __init__(self, plugin: "EssentialsPlugin"):
         super().__init__(plugin)
-        self.warps = {}
+        self.warps: dict[str, Location] = {}
         self.load_warps()
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
@@ -48,10 +48,11 @@ class WarpCommandExecutors(CommandExecutorBase):
                 )
 
             case "addwarp":
+
                 def on_submit(player: Player, json_str: str) -> None:
                     warp = str(json.loads(json_str)[0]).strip()
                     if len(warp) == 0:
-                        sender.send_error_message(f"Invalid warp name")
+                        sender.send_error_message("Invalid warp name")
                         return
 
                     if warp in self.warps:
@@ -63,7 +64,7 @@ class WarpCommandExecutors(CommandExecutorBase):
                     self.save_warps()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create warp {warp} at "
-                                            f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
+                        f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
                 sender.send_form(
