@@ -11,3 +11,15 @@ The modern essentials suite for endstone server.
 - [x] `/home` Set a home which you can teleport back later
 - [x] `/warp` Warp command
 - [x] `/notice` View server announcements
+
+## Install
+
+- Download .whl file from [release](https://github.com/endstone-essentials/essentials/releases) or [action](https://github.com/endstone-essentials/essentials/actions/workflows/build.yml)
+- Put it into `plugins` folder
+- Restart the server, enjoy!
+
+## Requirement
+
+Python: 3.10+
+
+Endstone: 0.4.11.dev137+
