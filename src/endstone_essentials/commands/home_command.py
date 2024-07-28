@@ -18,7 +18,7 @@ class HomeCommandExecutors(CommandExecutorBase):
 
     def __init__(self, plugin: "EssentialsPlugin"):
         super().__init__(plugin)
-        self.homes = {}
+        self.homes: dict[uuid.UUID, dict[str, Location]] = {}
         self.load_homes()
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:

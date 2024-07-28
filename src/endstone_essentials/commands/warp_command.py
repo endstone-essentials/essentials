@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class WarpCommandExecutors(CommandExecutorBase):
     def __init__(self, plugin: "EssentialsPlugin"):
         super().__init__(plugin)
-        self.warps = {}
+        self.warps: dict[str, Location] = {}
         self.load_warps()
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:

@@ -54,6 +54,7 @@ class EssentialsPlugin(Plugin):
             return True
 
         sender.send_error_message(f"Unhandled command /{command.name} {' '.join(args)}")
+        return True
 
     @event_handler()
     def on_player_death(self, event: PlayerDeathEvent):

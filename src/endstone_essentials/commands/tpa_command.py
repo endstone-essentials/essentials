@@ -1,3 +1,4 @@
+import uuid
 from typing import TYPE_CHECKING
 
 from endstone import ColorFormat, Player
@@ -14,7 +15,7 @@ class TpaCommandExecutor(CommandExecutorBase):
 
     def __init__(self, plugin: "EssentialsPlugin"):
         super().__init__(plugin)
-        self.teleport_requests = {}
+        self.teleport_requests: dict[uuid.UUID, uuid.UUID] = {}
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if not isinstance(sender, Player):
