@@ -13,5 +13,5 @@ __all__ = [
     "HomeCommandExecutors",
     "TpaCommandExecutor",
     "WarpCommandExecutors",
-    "NoticeCommandExecutors"
+    "NoticeCommandExecutors",
 ]

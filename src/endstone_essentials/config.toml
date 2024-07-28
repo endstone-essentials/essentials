@@ -8,6 +8,6 @@ warp = true
 notice = true
 
 [notice]
-title="Notice"
-body="This is a test notice\nqwq"
-button="OK"
+title = "Notice"
+body = "This is a test notice\nqwq"
+button = "OK"

@@ -8,7 +8,15 @@ from endstone.event import PlayerDeathEvent, event_handler
 from endstone.level import Location
 from endstone.plugin import Plugin
 
-from endstone_essentials.commands import *
+from endstone_essentials.commands import (
+    BackCommandExecutors,
+    BroadcastCommandExecutor,
+    FlyCommandExecutor,
+    HomeCommandExecutors,
+    WarpCommandExecutors,
+    TpaCommandExecutor,
+    NoticeCommandExecutors,
+)
 
 
 # NOTE(Vincent): maybe we can consider making this part of endstone api?

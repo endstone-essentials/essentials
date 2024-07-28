@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
-from endstone.form import *
+from endstone.form import MessageForm
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
 

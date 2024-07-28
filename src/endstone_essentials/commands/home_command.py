@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
-from endstone.form import *
+from endstone.form import ModalForm, Dropdown, TextInput
 from endstone.level import Location
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
@@ -51,10 +51,11 @@ class HomeCommandExecutors(CommandExecutorBase):
                 )
 
             case "addhome":
+
                 def on_submit(player: Player, json_str: str) -> None:
                     home = str(json.loads(json_str)[0]).strip()
                     if len(home) == 0:
-                        sender.send_error_message(f"Invalid home name")
+                        sender.send_error_message("Invalid home name")
                         return
 
                     location = player.location
@@ -68,7 +69,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                     self.save_homes()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create home {home} at "
-                                            f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
+                        f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
                 sender.send_form(

@@ -1,7 +1,8 @@
-from endstone import Player, ColorFormat
-from endstone.command import *
-from endstone.form import *
 from typing import TYPE_CHECKING
+
+from endstone import Player, ColorFormat
+from endstone.command import Command, CommandSender
+from endstone.form import ModalForm, Label
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
 
@@ -32,10 +33,8 @@ class NoticeCommandExecutors(CommandExecutorBase):
                 sender.send_form(
                     ModalForm(
                         title=self.notice_title,
-                        controls=[
-                            Label(text=self.notice_body)
-                        ],
-                        submit_button=self.notice_button
+                        controls=[Label(text=self.notice_body)],
+                        submit_button=self.notice_button,
                     )
                 )
 
