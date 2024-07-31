@@ -11,6 +11,7 @@ The modern essentials suite for endstone server.
 - [x] `/home` Set a home which you can teleport back later
 - [x] `/warp` Warp command
 - [x] `/notice` View server announcements
+- [x] `/ping` Get ping
 
 ## Install
 
@@ -22,4 +23,4 @@ The modern essentials suite for endstone server.
 
 Python: 3.10+
 
-Endstone: 0.4.11.dev137+
+Endstone: 0.5+
