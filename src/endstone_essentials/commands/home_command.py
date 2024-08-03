@@ -129,7 +129,7 @@ class HomeCommandExecutors(CommandExecutorBase):
         with path.open("r") as f:
             data = json.load(f)
 
-        level = self.plugin.server.levels[0]
+        level = self.plugin.server.level
         for player_uuid, homes in data.items():
             player_homes = {}
             for home_name, home_location in homes.items():

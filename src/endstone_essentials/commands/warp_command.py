@@ -122,7 +122,7 @@ class WarpCommandExecutors(CommandExecutorBase):
         with path.open("r") as f:
             data = json.load(f)
 
-        level = self.plugin.server.levels[0]
+        level = self.plugin.server.level
         for warp_name, warp_location in data.items():
             self.warps[warp_name] = Location(
                 level.get_dimension(warp_location[0]),
