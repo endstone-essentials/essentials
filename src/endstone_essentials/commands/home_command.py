@@ -36,7 +36,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                 def on_submit(player: Player, json_str: str) -> None:
                     index = int(json.loads(json_str)[0])
                     home, location = list(player_homes.items())[index]
-                    self.plugin.teleport_to_location(player, location)
+                    player.teleport(location)
                     player.send_message(ColorFormat.GREEN + f"You have been teleport to home {home}")
 
                 sender.send_form(
@@ -69,7 +69,7 @@ class HomeCommandExecutors(CommandExecutorBase):
                     self.save_homes()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create home {home} at "
-                        f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
+                                            f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
                 sender.send_form(

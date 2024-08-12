@@ -16,7 +16,7 @@ class BackCommandExecutors(CommandExecutorBase):
             return False
 
         location = self.plugin.last_death_locations[sender.unique_id]
-        self.plugin.teleport_to_location(sender, location)
+        sender.teleport(location)
         sender.send_message(ColorFormat.GREEN + "You have been teleported to the last place of death")
         del self.plugin.last_death_locations[sender.unique_id]  # remove the last death location
         return True

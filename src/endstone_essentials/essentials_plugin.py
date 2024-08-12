@@ -82,10 +82,3 @@ class EssentialsPlugin(Plugin):
     def teleport_to_player(self, source: Player, player: Player):
         # TODO(api): replace with player.teleport
         self.server.dispatch_command(self.server.command_sender, f'tp "{source.name}" "{player.name}"')
-
-    def teleport_to_location(self, player: Player, location: Location):
-        # TODO(api): replace with player.teleport
-        self.server.dispatch_command(
-            self.server.command_sender,
-            f'execute as "{player.name}" in {location.dimension.type.name.lower()} run tp @s {location.x} {location.y} {location.z}',
-        )

@@ -33,7 +33,7 @@ class WarpCommandExecutors(CommandExecutorBase):
                 def on_submit(player: Player, json_str: str) -> None:
                     index = int(json.loads(json_str)[0])
                     warp, location = list(self.warps.items())[index]
-                    self.plugin.teleport_to_location(player, location)
+                    player.teleport(location)
                     player.send_message(ColorFormat.GREEN + f"You have been teleport to warp {warp}")
 
                 sender.send_form(
@@ -64,7 +64,7 @@ class WarpCommandExecutors(CommandExecutorBase):
                     self.save_warps()
                     sender.send_message(
                         ColorFormat.GREEN + f"Successfully create warp {warp} at "
-                        f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
+                                            f"{location.dimension.type.name}, {location.x:.2f}, {location.y:.2f}, {location.z:.2f}"
                     )
 
                 sender.send_form(
