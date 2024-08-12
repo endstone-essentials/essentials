@@ -83,7 +83,7 @@ class TpaCommandExecutor(CommandExecutorBase):
         if source is None:
             player.send_message(ColorFormat.YELLOW + "The player who sent the teleport request is no longer online.")
         else:
-            self.plugin.teleport_to_player(source, player)
+            source.teleport(player)
             source.send_message(ColorFormat.GREEN + f"You have been teleported to {player.name}.")
             player.send_message(ColorFormat.GREEN + "Teleport request accepted.")
 
