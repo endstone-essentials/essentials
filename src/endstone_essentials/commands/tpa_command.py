@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
-from endstone.form import MessageForm
+from endstone.form import MessageForm, ModalForm, Label, Dropdown
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
 
@@ -23,6 +23,10 @@ class TpaCommandExecutor(CommandExecutorBase):
             return False
 
         match [command.name] + args:
+            case ["tpa"]:
+                # add tpa gui
+                self.show_tpa_form(sender)
+
             case ["tpa", player_name]:
                 player_name = player_name.strip('"')  # remove the leading and trailing quotes
                 if player_name == "@s" or player_name == sender.name:
@@ -44,6 +48,40 @@ class TpaCommandExecutor(CommandExecutorBase):
                 self.deny_teleport_request(sender)
 
         return True
+
+    # show tpa gui
+    def show_tpa_form(self, player: Player):
+        form = ModalForm(
+            title="Teleport Request",
+            submit_button="Request Teleport",
+            on_submit=lambda form, data: self.on_tpa_form_submit(player, data),
+            on_close=lambda player: player.send_message("Teleport request form closed.")
+        )
+
+        form.add_control(Label(text="Select a player to teleport to:"))
+
+        online_players = self.plugin.server.online_players
+        online_players_names = [p.name for p in online_players]
+        online_players_dropdown = Dropdown(
+            label="Online Players",
+            options=online_players_names,
+            default_index=0
+        )
+        form.add_control(online_players_dropdown)
+
+        player.send_form(form)
+
+    def on_tpa_form_submit(self, player: Player, data):
+        target = next((p for p in self.plugin.server.online_players), None)
+
+        if target:
+            if target == player:
+                player.send_error_message("You cannot teleport to yourself.")
+                return
+            self.handle_teleport_request(player, target)
+        else:
+            player.send_error_message("Selected player is not online.")
+
 
     def handle_teleport_request(self, player: Player, target: Player) -> None:
         if target.unique_id in self.teleport_requests:
