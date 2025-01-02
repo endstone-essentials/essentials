@@ -1,9 +1,10 @@
+import json
 import uuid
 from typing import TYPE_CHECKING
 
 from endstone import ColorFormat, Player
 from endstone.command import Command, CommandSender
-from endstone.form import MessageForm
+from endstone.form import MessageForm, ModalForm, Label, Dropdown
 
 from endstone_essentials.commands.command_executor_base import CommandExecutorBase
 
@@ -43,7 +44,34 @@ class TpaCommandExecutor(CommandExecutorBase):
             case ["tpdeny"]:
                 self.deny_teleport_request(sender)
 
+            case ["tpa"]:
+                self.open_form_selector(sender)
+
         return True
+    
+    def open_form_selector(self, player: Player):
+        online_players = [p for p in self.plugin.server.online_players if p.unique_id != player.unique_id]
+
+        if len(online_players) == 0:
+            player.send_error_message("There's no other in this server!")
+            return
+
+        form = ModalForm(
+            title="Teleport request",
+            submit_button="Request",
+            on_submit=lambda _, data: self.handle_teleport_request(player, online_players[json.loads(data)[1]]),
+            on_close=lambda _: player.send_message(ColorFormat.YELLOW + "Teleport request cancelled.")
+        )
+        label = Label("Choose a online player who will you")
+        selector = Dropdown(
+            label="teleport to:",
+            options=[p.name for p in online_players],
+            default_index=0
+        )
+        form.add_control(label)
+        form.add_control(selector)
+
+        player.send_form(form)
 
     def handle_teleport_request(self, player: Player, target: Player) -> None:
         if target.unique_id in self.teleport_requests:

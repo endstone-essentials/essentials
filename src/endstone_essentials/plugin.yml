@@ -12,7 +12,7 @@ commands:
     permissions: [ "essentials.command.broadcast" ]
   tpa:
     description: "Send a teleport request to another player."
-    usages: [ "/tpa <target: player>" ]
+    usages: [ "/tpa [target: player]" ]
     permissions: [ "essentials.command.tpa" ]
   tpaccept:
     description: "Accept a teleport request."
